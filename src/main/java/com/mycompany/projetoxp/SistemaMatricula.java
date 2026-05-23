@@ -4,10 +4,6 @@
  */
 package com.mycompany.projetoxp;
 
-/**
- *
- * @author samue
- */
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,48 +74,77 @@ public class SistemaMatricula {
     }
 
     public void matricularAluno(int idAluno, int idCurso) {
-    Aluno alunoEncontrado = buscarAlunoPorId(idAluno);
-    Curso cursoEncontrado = buscarCursoPorId(idCurso);
+        Aluno alunoEncontrado = buscarAlunoPorId(idAluno);
+        Curso cursoEncontrado = buscarCursoPorId(idCurso);
 
-    if (alunoEncontrado == null) {
-        System.out.println("Aluno não encontrado.");
-        return;
-    }
+        if (alunoEncontrado == null) {
+            System.out.println("Aluno não encontrado.");
+            return;
+        }
 
-    if (cursoEncontrado == null) {
-        System.out.println("Curso não encontrado.");
-        return;
-    }
+        if (cursoEncontrado == null) {
+            System.out.println("Curso não encontrado.");
+            return;
+        }
 
-    int quantidadeMatriculasCurso = contarMatriculasPorCurso(idCurso);
+        if (verificarMatriculaDuplicada(idAluno, idCurso)) {
+            System.out.println("Este aluno já está matriculado neste curso.");
+            return;
+        }
 
-    if (quantidadeMatriculasCurso >= cursoEncontrado.getQuantidadeVagasCurso()) {
-        System.out.println("Não há vagas disponíveis para este curso.");
-        return;
-    }
+        int quantidadeMatriculasCurso = contarMatriculasPorCurso(idCurso);
 
-    Matricula novaMatricula = new Matricula(
-            proximoIdMatricula,
-            alunoEncontrado,
-            cursoEncontrado
-    );
+        if (quantidadeMatriculasCurso >= cursoEncontrado.getQuantidadeVagasCurso()) {
+            System.out.println("Não há vagas disponíveis para este curso.");
+            return;
+        }
+
+        Matricula novaMatricula = new Matricula(
+                proximoIdMatricula,
+                alunoEncontrado,
+                cursoEncontrado
+        );
 
         listaMatriculas.add(novaMatricula);
         proximoIdMatricula++;
 
         System.out.println("Matrícula realizada com sucesso.");
     }
-    
-    private int contarMatriculasPorCurso(int idCurso) {
-    int quantidadeMatriculasCurso = 0;
 
-    for (Matricula matriculaAtual : listaMatriculas) {
-        if (matriculaAtual.getCursoMatriculado().getIdCurso() == idCurso) {
-            quantidadeMatriculasCurso++;
+    public void cancelarMatricula(int idMatricula) {
+        Matricula matriculaEncontrada = buscarMatriculaPorId(idMatricula);
+
+        if (matriculaEncontrada == null) {
+            System.out.println("Matrícula não encontrada.");
+            return;
         }
+
+        listaMatriculas.remove(matriculaEncontrada);
+
+        System.out.println("Matrícula cancelada com sucesso.");
     }
 
-    return quantidadeMatriculasCurso;
+    private boolean verificarMatriculaDuplicada(int idAluno, int idCurso) {
+        for (Matricula matriculaAtual : listaMatriculas) {
+            if (matriculaAtual.getAlunoMatriculado().getIdAluno() == idAluno
+                    && matriculaAtual.getCursoMatriculado().getIdCurso() == idCurso) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int contarMatriculasPorCurso(int idCurso) {
+        int quantidadeMatriculasCurso = 0;
+
+        for (Matricula matriculaAtual : listaMatriculas) {
+            if (matriculaAtual.getCursoMatriculado().getIdCurso() == idCurso) {
+                quantidadeMatriculasCurso++;
+            }
+        }
+
+        return quantidadeMatriculasCurso;
     }
 
     private Aluno buscarAlunoPorId(int idAluno) {
@@ -142,32 +167,61 @@ public class SistemaMatricula {
         return null;
     }
 
+    private Matricula buscarMatriculaPorId(int idMatricula) {
+        for (Matricula matriculaAtual : listaMatriculas) {
+            if (matriculaAtual.getIdMatricula() == idMatricula) {
+                return matriculaAtual;
+            }
+        }
+
+        return null;
+    }
+
     public void listarAlunos() {
+        if (listaAlunos.isEmpty()) {
+            System.out.println("Nenhum aluno cadastrado.");
+            return;
+        }
+
         for (Aluno alunoAtual : listaAlunos) {
             System.out.println(
-                    alunoAtual.getIdAluno() + " - " +
-                    alunoAtual.getNomeAluno() + " - " +
-                    alunoAtual.getEmailAluno()
+                    alunoAtual.getIdAluno() + " - "
+                    + alunoAtual.getNomeAluno() + " - "
+                    + alunoAtual.getEmailAluno()
             );
         }
     }
 
     public void listarCursos() {
+        if (listaCursos.isEmpty()) {
+            System.out.println("Nenhum curso cadastrado.");
+            return;
+        }
+
         for (Curso cursoAtual : listaCursos) {
+            int quantidadeMatriculasCurso = contarMatriculasPorCurso(cursoAtual.getIdCurso());
+            int quantidadeVagasDisponiveis = cursoAtual.getQuantidadeVagasCurso() - quantidadeMatriculasCurso;
+
             System.out.println(
-                    cursoAtual.getIdCurso() + " - " +
-                    cursoAtual.getNomeCurso() + " - Vagas: " +
-                    cursoAtual.getQuantidadeVagasCurso()
+                    cursoAtual.getIdCurso() + " - "
+                    + cursoAtual.getNomeCurso()
+                    + " - Vagas totais: " + cursoAtual.getQuantidadeVagasCurso()
+                    + " - Vagas disponíveis: " + quantidadeVagasDisponiveis
             );
         }
     }
 
     public void listarMatriculas() {
+        if (listaMatriculas.isEmpty()) {
+            System.out.println("Nenhuma matrícula cadastrada.");
+            return;
+        }
+
         for (Matricula matriculaAtual : listaMatriculas) {
             System.out.println(
-                    "Matrícula " + matriculaAtual.getIdMatricula() +
-                    " | Aluno: " + matriculaAtual.getAlunoMatriculado().getNomeAluno() +
-                    " | Curso: " + matriculaAtual.getCursoMatriculado().getNomeCurso()
+                    "Matrícula " + matriculaAtual.getIdMatricula()
+                    + " | Aluno: " + matriculaAtual.getAlunoMatriculado().getNomeAluno()
+                    + " | Curso: " + matriculaAtual.getCursoMatriculado().getNomeCurso()
             );
         }
     }

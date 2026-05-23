@@ -3,15 +3,15 @@
  */
 
 package com.mycompany.projetoxp;
-import java.util.Scanner;
 
+import java.util.Scanner;
 
 /**
  *
  * @author samue
  */
-
 public class ProjetoXP {
+
     public static void main(String[] args) {
 
         Scanner leitorEntrada = new Scanner(System.in);
@@ -27,6 +27,7 @@ public class ProjetoXP {
             System.out.println("4 - Listar alunos");
             System.out.println("5 - Listar cursos");
             System.out.println("6 - Listar matrículas");
+            System.out.println("7 - Cancelar matrícula");
             System.out.println("0 - Sair");
             System.out.print("Escolha uma opção: ");
 
@@ -73,6 +74,13 @@ public class ProjetoXP {
 
                 case 6:
                     sistemaMatricula.listarMatriculas();
+                    break;
+
+                case 7:
+                    System.out.print("Informe o ID da matrícula que deseja cancelar: ");
+                    int idMatricula = Integer.parseInt(leitorEntrada.nextLine());
+
+                    sistemaMatricula.cancelarMatricula(idMatricula);
                     break;
 
                 case 0:
