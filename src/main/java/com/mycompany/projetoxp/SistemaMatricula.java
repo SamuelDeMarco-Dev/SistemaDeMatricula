@@ -78,29 +78,48 @@ public class SistemaMatricula {
     }
 
     public void matricularAluno(int idAluno, int idCurso) {
-        Aluno alunoEncontrado = buscarAlunoPorId(idAluno);
-        Curso cursoEncontrado = buscarCursoPorId(idCurso);
+    Aluno alunoEncontrado = buscarAlunoPorId(idAluno);
+    Curso cursoEncontrado = buscarCursoPorId(idCurso);
 
-        if (alunoEncontrado == null) {
-            System.out.println("Aluno não encontrado.");
-            return;
-        }
+    if (alunoEncontrado == null) {
+        System.out.println("Aluno não encontrado.");
+        return;
+    }
 
-        if (cursoEncontrado == null) {
-            System.out.println("Curso não encontrado.");
-            return;
-        }
+    if (cursoEncontrado == null) {
+        System.out.println("Curso não encontrado.");
+        return;
+    }
 
-        Matricula novaMatricula = new Matricula(
-                proximoIdMatricula,
-                alunoEncontrado,
-                cursoEncontrado
-        );
+    int quantidadeMatriculasCurso = contarMatriculasPorCurso(idCurso);
+
+    if (quantidadeMatriculasCurso >= cursoEncontrado.getQuantidadeVagasCurso()) {
+        System.out.println("Não há vagas disponíveis para este curso.");
+        return;
+    }
+
+    Matricula novaMatricula = new Matricula(
+            proximoIdMatricula,
+            alunoEncontrado,
+            cursoEncontrado
+    );
 
         listaMatriculas.add(novaMatricula);
         proximoIdMatricula++;
 
         System.out.println("Matrícula realizada com sucesso.");
+    }
+    
+    private int contarMatriculasPorCurso(int idCurso) {
+    int quantidadeMatriculasCurso = 0;
+
+    for (Matricula matriculaAtual : listaMatriculas) {
+        if (matriculaAtual.getCursoMatriculado().getIdCurso() == idCurso) {
+            quantidadeMatriculasCurso++;
+        }
+    }
+
+    return quantidadeMatriculasCurso;
     }
 
     private Aluno buscarAlunoPorId(int idAluno) {
